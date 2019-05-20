@@ -1,8 +1,8 @@
 extends layout
 
 block content
-  <h1>#{title}</h1>
-  <p>Welcome to #{title}</p>
+  h1=title
+  p Welcome to #{title}
 
   form(method='post' action='/' enctype='multipart/form-data' )
     input(type='button' value='Scan' onclick='AcquireImage();')
