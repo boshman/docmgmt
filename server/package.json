@@ -13,7 +13,7 @@
     "formidable": "^1.2.1",
     "http-errors": "~1.6.3",
     "morgan": "~1.9.1",
-    "pug": "2.0.0-beta11"
+    "adaro": "~1.0.4"
   },
   "devDependencies": {
     "nodemon": "^1.19.0"

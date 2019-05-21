@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>{title}</title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <script type="text/javascript" src="/Resources/dynamsoft.webtwain.initiate.js"></script>
+    <script type="text/javascript" src="/Resources/dynamsoft.webtwain.config.js"></script>
+  </head>
+  <body>
+    <h1>{title}</h1>
+    <p>Welcome to {title}</p>
+
+    <form method="POST" action="/" enctype="multipart/form-data">
+      <p id="message" style="color:red">{message}</p>
+      <br /><br />
+      <input type="button" value="Scan" onclick="AcquireImage();" />
+      <br /><br />
+      <input type="button" value="Upload Scan" onclick="DoUpload();" />
+      <br /><br />
+      <div id="dwtcontrolContainer" />
+
+      <script>
+        function AcquireImage() {
+          var DWObject = Dynamsoft.WebTwainEnv.GetWebTwain('dwtcontrolContainer');
+          if (DWObject) {
+              DWObject.SelectSource(function () {
+                var OnAcquireImageSuccess = OnAcquireImageFailure = function () {
+                  DWObject.CloseSource();
+                };
+                DWObject.OpenSource();
+                DWObject.IfDisableSourceAfterAcquire = true;
+                DWObject.AcquireImage(OnAcquireImageSuccess, OnAcquireImageFailure);
+              }, function () {console.log('SelectSource failed!');});
+          } 
+        }
+  
+        function DoUpload() {
+          var strHTTPServer = location.hostname; 
+          var CurrentPathName = unescape(location.pathname); 
+          var CurrentPath = CurrentPathName.substring(0, CurrentPathName.lastIndexOf("/") + 1); 
+          var strActionPage = CurrentPath; 
+          var uploadfilename = "TestImage.pdf";
+          var DWObject = Dynamsoft.WebTwainEnv.GetWebTwain('dwtcontrolContainer');
+          if (DWObject) {
+            DWObject.HTTPPort = location.port == "" ? 80 : location.port; 
+            DWObject.HTTPUploadAllThroughPostAsMultiPageTIFF (strHTTPServer, strActionPage, uploadfilename, 
+              function() {
+                console.log("successful");
+                document.getElementById("message").innerText = "Upload successful";
+              },
+              function() {
+                alert("error occurred -- see console"); 
+                console.log("ErrorString - " + DWObject.ErrorString);
+                console.log("HTTPPostResponseString - " + DWObject.HTTPPostResponseString);
+              }
+            );
+          }
+        }
+      </script>      
+
+    </form>
+
+
+  </body>
+</html>
