@@ -9,7 +9,7 @@ var path = require('path');
 /* GET home page. */
 router.get('/', function(req, res, next) {
   console.log('index.js get')
-  res.render('index', { title: 'DocMgmt' });
+  res.render('index.html', { "title": "DocMgmt" });
 });
 
 router.post('/', function(req, res, next) {
