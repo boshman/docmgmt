@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+  {{> head }}
+  <body>
+      <script type="text/javascript" src="/Resources/dynamsoft.webtwain.initiate.js"></script>
+      <script type="text/javascript" src="/Resources/dynamsoft.webtwain.config.js"></script>
+      {{> header}}
+
+    <form method="POST" action="/scan" enctype="multipart/form-data">
+      <p id="message" style="color:red">{{ message }}</p>
+      <br /><br />
+      <label for="FirstName">First Name</label> <input type="text" id="FirstName" />
+      <br /><br />
+      <label for="LastName">Last Name</label> <input type="text" id="LastName" />
+      <br /><br />
+      <input type="button" value="Scan" onclick="AcquireImage();" />
+      <br /><br />
+      <div id="dwtcontrolContainer" ></div>
+      <br /><br />
+      <input type="button" value="Upload Scan" onclick="DoUpload();" />
+    </form>
+
+    <script type="text/javascript">
+      function AcquireImage() {
+        var DWObject = Dynamsoft.WebTwainEnv.GetWebTwain('dwtcontrolContainer');
+        if (DWObject) {
+            DWObject.SelectSource(function () {
+              var OnAcquireImageSuccess = OnAcquireImageFailure = function () {
+                DWObject.CloseSource();
+              };
+              DWObject.OpenSource();
+              DWObject.IfDisableSourceAfterAcquire = true;
+              DWObject.AcquireImage(OnAcquireImageSuccess, OnAcquireImageFailure);
+            }, function () {console.log('SelectSource failed!');});
+        } 
+      }
+
+      function DoUpload() {
+        var strHTTPServer = location.hostname; 
+        var CurrentPathName = unescape(location.pathname); 
+        var CurrentPath = CurrentPathName.substring(0, CurrentPathName.lastIndexOf("/") + 1); 
+        var strActionPage = CurrentPath + "scan";
+        console.log("strActionPage=" + strActionPage) ;
+        var uploadfilename = "TestImage.pdf";
+        var DWObject = Dynamsoft.WebTwainEnv.GetWebTwain('dwtcontrolContainer');
+        if (DWObject) {
+          DWObject.ClearAllHTTPFormField();
+          DWObject.SetHTTPFormField("FIRST_NAME", document.getElementById("FirstName").value);
+          DWObject.SetHTTPFormField("LAST_NAME", document.getElementById("LastName").value);
+          DWObject.HTTPPort = location.port == "" ? 80 : location.port; 
+          DWObject.HTTPUploadAllThroughPostAsMultiPageTIFF (strHTTPServer, strActionPage, uploadfilename, 
+            function() {
+              console.log("successful");
+              document.getElementById("message").innerText = "Upload successful";
+            },
+            function() {
+              alert("error occurred -- see console"); 
+              console.log("ErrorString - " + DWObject.ErrorString);
+              console.log("HTTPPostResponseString - " + DWObject.HTTPPostResponseString);
+            }
+          );
+        }
+      }
+    </script>      
+
+
+  </body>
+</html>

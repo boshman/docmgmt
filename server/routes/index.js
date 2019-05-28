@@ -6,35 +6,33 @@ var fs = require('fs');
 const utils = require('../scripts/utils');
 var path = require('path');
 
+const uploadFolder = 'C:/Temp/uploads/';
+
 /* GET home page. */
 router.get('/', function(req, res, next) {
   console.log('index.js get')
-  res.render('index.html', { "title": "DocMgmt" });
-});
 
-router.post('/', function(req, res, next) {
-  console.log('index.js post');
+  // If DELETE, call the 'delete' route
+  if ( req.query._method == 'DELETE' ) {
+    // change the original METHOD
+    // into DELETE method
+    utils.deleteAllFiles();
+  }       
 
-  var form = new formidable.IncomingForm();
-  var msg = "";
-  var oldpath = "";
-  var newpath = "";
-  var maxFileNum = 0;
+  // get list of json files
+  var files = fs.readdirSync(uploadFolder, { withFileTypes: true});
 
-  const uploadFolder = 'C:/Temp/uploads/';
-  
-  form.parse(req, function (err, fields, files) {
-    if (files.RemoteFile) {
-      oldpath = files.RemoteFile.path;
-      newpath = 'C:/Temp/uploads/' + utils.getNewFileNum(uploadFolder) + '.tiff';
-      fs.rename(oldpath, newpath, function (err) {
-        if (err) throw err;
-      });
-      msg = "processed scanned image";
-      res.end();
+  // read each file
+  var jsonArray = [];
+  for (var i = 0; i < files.length; i++) {
+    if (files[i].isFile() && files[i].name.endsWith("json")) {
+      var rawdata = fs.readFileSync(uploadFolder + files[i].name);
+      var json = JSON.parse(rawdata);
+      jsonArray.push(json);
     }
-  });
-  
-})
+  }
+  res.render('index.html', { "title": "DocMgmt", "docData" : jsonArray });
+
+});
 
 module.exports = router;

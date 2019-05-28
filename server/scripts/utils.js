@@ -9,6 +9,7 @@ class Utils {
         var files = fs.readdirSync(dir, { withFileTypes: true});
 
         for (var i = 0; i < files.length; i++) {
+            
             if (files[i].isFile) {
                 // Get the name without extension
                 var pathObj = path.parse(path.join(dir, files[i].name)); // returns "testfile" from testfile.txt
@@ -23,6 +24,18 @@ class Utils {
 
         return Number(maxFileNum) + 1;
     }
+
+    deleteAllFiles() {
+        const uploadFolder = 'C:/Temp/uploads/';
+
+        // Find each file in the scan folder and delete
+        var files = fs.readdirSync(uploadFolder, { withFileTypes: true});
+      
+        for (var i = 0; i < files.length; i++) {
+          fs.unlinkSync(uploadFolder + files[i].name);
+        }
+      
+    }    
 }
 
 module.exports = new Utils();
