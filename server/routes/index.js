@@ -12,21 +12,23 @@ var uploadFolder = utils.getUploadFolder();
 router.get('/', function(req, res, next) {
   console.log('index.js get')
 
-  // If a file is requested
+  // If a file is requested, send it to the client
   // localhost:3000/?file=10001.tiff
   if (req.query.file) {
     res.sendFile(uploadFolder + req.query.file);
   }
   else {
-    // If DELETE, call the 'delete' route
+    // If DELETE, call the 'delete' route. 
     if ( req.query._method == 'DELETE' ) {
       if (req.query.memberNum) {
+        // localhost:3000/?_method=DELETE&memberNum=10001
         utils.deleteMember(req.query.memberNum);
       }
-      else
-        // change the original METHOD
-        // into DELETE method
+      else {
+        // If no member number, then delete ALL files
+        // localhost:3000/?_method=DELETE
         utils.deleteAllFiles();
+      }
     }
     
     // get list of json files

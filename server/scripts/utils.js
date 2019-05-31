@@ -12,19 +12,16 @@ class Utils {
     }
 
     deleteAllFiles() {
-
         // Find each file in the scan folder and delete
         var files = fs.readdirSync(uploadFolder, { withFileTypes: true});
       
         for (var i = 0; i < files.length; i++) {
           fs.unlinkSync(uploadFolder + files[i].name);
         }
-      
     }    
 
     getFile(fileName) {
         var file = fs.readFileSync(uploadFolder + fileName);
-
     }
 
     getUploadFolder() {
