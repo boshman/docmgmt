@@ -1,32 +1,17 @@
 var fs = require('fs');
 const path = require('path');
 
+const uploadFolder = 'C:/Temp/uploads/';
+var filenum = 10000;
+
 class Utils {
+
     getNewFileNum(dir) {
-        var maxFileNum = 10000;
-        var currFileNum = 0;
-
-        var files = fs.readdirSync(dir, { withFileTypes: true});
-
-        for (var i = 0; i < files.length; i++) {
-            
-            if (files[i].isFile) {
-                // Get the name without extension
-                var pathObj = path.parse(path.join(dir, files[i].name)); // returns "testfile" from testfile.txt
-
-                // Skip if filename is non numeric
-                if (!isNaN(pathObj.name)){
-                    currFileNum = pathObj.name;
-                    maxFileNum = (currFileNum > maxFileNum) ? currFileNum : maxFileNum;
-                }
-            }
-        }
-
-        return Number(maxFileNum) + 1;
+        filenum++;
+        return filenum;
     }
 
     deleteAllFiles() {
-        const uploadFolder = 'C:/Temp/uploads/';
 
         // Find each file in the scan folder and delete
         var files = fs.readdirSync(uploadFolder, { withFileTypes: true});
@@ -36,6 +21,20 @@ class Utils {
         }
       
     }    
+
+    getFile(fileName) {
+        var file = fs.readFileSync(uploadFolder + fileName);
+
+    }
+
+    getUploadFolder() {
+        return uploadFolder;
+    }
+
+    deleteMember(memberNum){ 
+        fs.unlinkSync(uploadFolder + memberNum + '.tiff');
+        fs.unlinkSync(uploadFolder + memberNum + '.json');
+    }
 }
 
 module.exports = new Utils();

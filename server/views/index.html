@@ -9,14 +9,15 @@
       <table class="table table-striped">
         <thead>
           <tr >
-            <th scope="col">First Name</th><th scope="col">Last Name</th><th scope="col">File</th>
+            <th scope="col">First Name</th><th scope="col">Last Name</th><th scope="col">File</th><th scope="col"></th>
           </tr>
         </thead>
           {{ #docData }}
           <tr scope="row">
             <td >{{firstName}}</td>
             <td>{{lastName}}</td>
-            <td>{{fileName}}</td>
+            <td><a href="/?file={{fileName}}" target="_blank">{{fileName}}</a></td>
+            <td><a href="/?_method=DELETE&memberNum={{memberNum}}" class="btn btn-info btn-sm">Remove</a></td>
           </tr>
           {{ /docData}}
       </table>

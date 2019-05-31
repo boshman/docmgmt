@@ -6,8 +6,6 @@ var fs = require('fs');
 const utils = require('../scripts/utils');
 var path = require('path');
 
-const uploadFolder = 'C:/Temp/uploads/';
-
 /* GET home page. */
 router.get('/', function(req, res, next) {
   console.log('scan.js get')
@@ -23,8 +21,7 @@ router.post('/', function(req, res, next) {
   var oldpath = "";
   var newpath = "";
   var maxFileNum = 0;
-
-  const uploadFolder = 'C:/Temp/uploads/';
+  var uploadFolder = utils.getUploadFolder();
   
   form.parse(req, function (err, fields, files) {
     if (files.RemoteFile) {
@@ -41,10 +38,8 @@ router.post('/', function(req, res, next) {
       var newJsonString = JSON.stringify(newJson);
       console.log("newJsonString = " + newJsonString);
 
-      var json = { firstName : firstName, lastName : lastName, fileName : fileBaseName + ".tiff"};
-      //var jsonString = "{ \"firstName\" : \"" + firstName + "\", \"lastName\" : \"" + lastName + "\", \"filename\" : \"" + fileBaseName + ".tiff\" }";
+      var json = { firstName : firstName, lastName : lastName, fileName : fileBaseName + ".tiff", memberNum : fileBaseName};
       var jsonString = JSON.stringify(json);
-      console.log(jsonString);
       fs.appendFile(uploadFolder + fileBaseName + '.json', jsonString, function(err) {
         if (err) throw err;
       });
