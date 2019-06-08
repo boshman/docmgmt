@@ -13,7 +13,9 @@
     "formidable": "^1.2.1",
     "http-errors": "~1.6.3",
     "morgan": "~1.9.1",
-    "mustache-express": "^1.2.8"
+    "mustache-express": "^1.2.8",
+    "mysql": "^2.17.1",
+    "webhdfs": "^1.2.0"
   },
   "devDependencies": {
     "nodemon": "^1.19.0"
