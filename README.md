@@ -41,5 +41,3 @@ Start the server in DEV mode:
 When setting up the ExpressJS site, I used the command
 
     express server --view=mustache-express
-
-Down the road there will be a front-end framework and some database on the back-end.
