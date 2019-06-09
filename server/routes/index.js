@@ -17,18 +17,19 @@ router.get("/", function(req, res, next) {
   // localhost:3000/?file=10001.tiff
   if (req.query.file) {
     // Get from hadoop
-    res.sendFile(uploadFolder + req.query.file);
+    utils.getFile(req.query.file, (err, data) => {
+      if (err) throw err;
+      fs.writeFile(utils.getTempFolder() + req.query.file, data, err => {
+        if (err) throw err;
+        res.sendFile(utils.getTempFolder() + req.query.file);
+      });
+    });
   } else {
     // If DELETE, call the 'delete' route.
     if (req.query._method == "DELETE") {
-      if (req.query.memberNum) {
-        // localhost:3000/?_method=DELETE&memberNum=10001
-        utils.deleteMember(req.query.memberNum);
-      } else {
-        // If no member number, then delete ALL files
-        // localhost:3000/?_method=DELETE
-        utils.deleteAllFiles();
-      }
+      // localhost:3000/?_method=DELETE&memberNum=10001
+      utils.deleteFile(req.query.memberNum);
+      db.deleteDoc(req.query.memberNum);
     }
 
     db.getAllDocs().then(docs => {

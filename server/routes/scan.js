@@ -32,7 +32,6 @@ router.post("/", function(req, res, next) {
 
       db.addDoc(firstName, lastName).then(docNum => {
         var fileBaseName = docNum;
-        console.log("fileBaseName: " + fileBaseName);
 
         utils.putFile(files, fileBaseName);
       });

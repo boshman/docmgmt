@@ -42,6 +42,15 @@ class DB {
       //await conn.end();
     }
   }
+
+  async deleteDoc(documentNumber) {
+    try {
+      await query("DELETE FROM  doc WHERE DOCUMENT_NUMBER = ?", [
+        documentNumber
+      ]);
+    } finally {
+    }
+  }
 }
 
 module.exports = new DB();

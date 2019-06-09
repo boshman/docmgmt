@@ -2,11 +2,11 @@ var fs = require("fs");
 const path = require("path");
 var WebHDFS = require("webhdfs");
 
+const useHadoop = true;
+
 const uploadFolder = "C:/Temp/uploads/";
 const tempFolder = "C:/Temp/tempuploads/";
 const uploadFolderHDFS = "/myhdfsfol1/";
-
-var filenum = 10000;
 
 var hdfs = WebHDFS.createClient({
   user: "hduser",
@@ -16,53 +16,56 @@ var hdfs = WebHDFS.createClient({
 });
 
 class Utils {
-  getNewFileNum() {
-    filenum++;
-    return filenum;
-  }
-
-  deleteAllFiles() {
-    // Find each file in the scan folder and delete
-    var files = fs.readdirSync(uploadFolder, { withFileTypes: true });
-
-    for (var i = 0; i < files.length; i++) {
-      fs.unlinkSync(uploadFolder + files[i].name);
+  getFile(fileName, callback) {
+    if (useHadoop) {
+      hdfs.readFile(uploadFolderHDFS + fileName, callback);
+    } else {
+      fs.readFile(uploadFolder + fileName, callback);
     }
-  }
-
-  getFile(fileName) {
-    var file = fs.readFileSync(uploadFolder + fileName);
   }
 
   getUploadFolder() {
     return uploadFolder;
   }
 
-  deleteMember(memberNum) {
-    fs.unlinkSync(uploadFolder + memberNum + ".tiff");
-    fs.unlinkSync(uploadFolder + memberNum + ".json");
+  getTempFolder() {
+    return tempFolder;
+  }
+
+  deleteFile(memberNum) {
+    if (useHadoop) {
+      hdfs.unlink(uploadFolderHDFS + memberNum + ".tiff");
+    } else {
+      fs.unlinkSync(uploadFolder + memberNum + ".tiff");
+    }
   }
 
   putFile(dynamsoftFiles, fileBaseName) {
     if (dynamsoftFiles.RemoteFile) {
       // Save the uploaded image to temp folder
       var oldpath = dynamsoftFiles.RemoteFile.path;
-      var newpath = uploadFolder + fileBaseName + ".tiff";
-      fs.rename(oldpath, newpath, function(err) {
+      var newpath = tempFolder + fileBaseName + ".tiff";
+      fs.rename(oldpath, newpath, err => {
         if (err) throw err;
 
-        // Stream the file from temp folder to HDFS
-        var localFileStream = fs.createReadStream(newpath);
-        var remoteFileStream = hdfs.createWriteStream(
-          uploadFolderHDFS + fileBaseName + ".tiff"
-        );
-        localFileStream.pipe(remoteFileStream);
+        if (useHadoop) {
+          // Stream the file from temp folder to HDFS
+          var localFileStream = fs.createReadStream(newpath);
+          var remoteFileStream = hdfs.createWriteStream(
+            uploadFolderHDFS + fileBaseName + ".tiff"
+          );
+          localFileStream.pipe(remoteFileStream);
 
-        remoteFileStream.on("error", function(err) {
-          if (err) throw err;
-        });
+          remoteFileStream.on("error", err => {
+            if (err) throw err;
+          });
+        } else {
+          fs.rename(newpath, uploadFolder + fileBaseName + ".tiff", err => {
+            if (err) throw err;
+          });
+        }
 
-        return fileBaseName;
+        fs.unlinkSync(newpath);
       });
     }
   }
